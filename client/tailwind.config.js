@@ -1,20 +1,12 @@
-/** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: { sans: ["Inter", "sans-serif"] },
       colors: {
-        primary: {
-          DEFAULT: "#167D9A",
-          dark: "#145477",
-          light: "#EAF4F8"
-        }
-      }
+        brand: { 50: "#eff6ff", 500: "#3b82f6", 600: "#2563eb", 700: "#1d4ed8" },
+      },
     },
   },
   plugins: [],
 };
-
