@@ -31,3 +31,4 @@ coverage/
 .claude/
 .windsurf/
 .agents/
+skills-lock.json
