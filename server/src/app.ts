@@ -5,6 +5,8 @@ import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 import { errorHandler, notFound } from "./middlewares/errorHandler";
 import authRoutes from "./routes/auth.routes";
+import patientRoutes from "./routes/patient.routes";
+import appointmentRoutes from "./routes/appointment.routes";
 
 const app = express();
 
@@ -21,8 +23,8 @@ app.get("/api/health", (_req, res) => {
 
 // Les routes seront branchées ici :
 app.use("/api/auth", authRoutes);
-// app.use("/api/patients", patientRoutes);
-// app.use("/api/appointments", appointmentRoutes);
+app.use("/api/patients", patientRoutes);
+app.use("/api/appointments", appointmentRoutes);
 // app.use("/api/dashboard", dashboardRoutes);
 
 app.use(notFound);
