@@ -1,0 +1,30 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { env } from "./config/env";
+import { errorHandler, notFound } from "./middlewares/errorHandler";
+
+const app = express();
+
+app.use(helmet());
+app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
+app.use(express.json());
+
+// Limite les tentatives (anti brute-force) sur toute l'API
+app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, limit: 300 }));
+
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
+
+// Les routes seront branchées ici :
+// app.use("/api/auth", authRoutes);
+// app.use("/api/patients", patientRoutes);
+// app.use("/api/appointments", appointmentRoutes);
+// app.use("/api/dashboard", dashboardRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;

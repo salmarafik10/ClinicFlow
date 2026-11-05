@@ -1,15 +1,16 @@
-import "dotenv/config";
-import express from "express";
+import app from "./app";
+import { env } from "./config/env";
+import { prisma } from "./config/prisma";
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-app.use(express.json());
-
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok" });
+const server = app.listen(env.PORT, () => {
+  console.log(`Server running on port ${env.PORT}`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+async function shutdown() {
+  server.close();
+  await prisma.$disconnect();
+  process.exit(0);
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
