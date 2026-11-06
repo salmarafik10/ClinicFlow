@@ -4,7 +4,7 @@ import { Plus, Search, Pencil, Trash2, Eye, ChevronLeft, ChevronRight } from "lu
 import { api } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import PatientModal from "../components/PatientModal";
-import { Patient, Pagination } from "../types";
+import type { Patient, Pagination } from "../types";
 
 const LIMIT = 8;
 

@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { X } from "lucide-react";
 import { api } from "../api/axios";
-import { Patient } from "../types";
+import type { Patient } from "../types";
 
 interface Props {
   patient: Patient | null; // null = création
