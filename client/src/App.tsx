@@ -4,6 +4,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Layout from "./layouts/Layout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Patients from "./pages/Patients";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
             }
           >
             <Route path="/" element={<Dashboard />} />
+            <Route path="/patients" element={<Patients />} />
             {/* /patients et /appointments seront ajoutés ensuite */}
           </Route>
         </Routes>
