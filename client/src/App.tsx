@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Patients from "./pages/Patients";
 import PatientDetails from "./pages/PatientDetails";
+import Appointments from "./pages/Appointments";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/patients/:id" element={<PatientDetails />} />
+            <Route path="/appointments" element={<Appointments />} />
             {/* /patients et /appointments seront ajoutés ensuite */}
           </Route>
         </Routes>
