@@ -14,3 +14,19 @@ export interface Pagination {
   total: number;
   totalPages: number;
 }
+export type AppointmentStatus = "pending" | "confirmed" | "cancelled";
+
+export interface Appointment {
+  id: string;
+  patientId: string;
+  appointmentDate: string;
+  status: AppointmentStatus;
+  reason: string;
+  notes: string | null;
+  createdAt: string;
+  patient?: { id: string; fullName: string; cin: string };
+}
+
+export interface PatientWithAppointments extends Patient {
+  appointments: Appointment[];
+}
