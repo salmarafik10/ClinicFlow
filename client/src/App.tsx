@@ -7,10 +7,12 @@ import Dashboard from "./pages/Dashboard";
 import Patients from "./pages/Patients";
 import PatientDetails from "./pages/PatientDetails";
 import Appointments from "./pages/Appointments";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
     <AuthProvider>
+       <Toaster position="top-right" toastOptions={{ style: { borderRadius: "12px" } }} />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
