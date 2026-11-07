@@ -56,3 +56,19 @@ export async function deletePatient(id: string, userId: string) {
   await prisma.patient.update({ where: { id }, data: { deletedAt: new Date() } });
   await logAction(userId, "DELETE", "patient", id, { fullName: patient.fullName });
 }
+
+export async function listDeletedPatients() {
+  return prisma.patient.findMany({
+    where: { deletedAt: { not: null } },
+    orderBy: { deletedAt: "desc" },
+  });
+}
+
+export async function restorePatient(id: string, userId: string) {
+  const patient = await prisma.patient.findFirst({ where: { id, deletedAt: { not: null } } });
+  if (!patient) throw new AppError(404, "Patient supprimé introuvable");
+
+  const restored = await prisma.patient.update({ where: { id }, data: { deletedAt: null } });
+  await logAction(userId, "RESTORE", "patient", id, { fullName: patient.fullName });
+  return restored;
+}

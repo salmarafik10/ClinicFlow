@@ -33,3 +33,12 @@ export async function remove(req: Request, res: Response) {
   await service.deletePatient(id, req.user!.id);
   res.status(204).send();
 }
+
+export async function listDeleted(_req: Request, res: Response) {
+  res.json(await service.listDeletedPatients());
+}
+
+export async function restore(req: Request, res: Response) {
+  const { id } = idParamSchema.parse(req.params);
+  res.json(await service.restorePatient(id, req.user!.id));
+}
