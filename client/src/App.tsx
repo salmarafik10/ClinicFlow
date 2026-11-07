@@ -8,6 +8,8 @@ import Patients from "./pages/Patients";
 import PatientDetails from "./pages/PatientDetails";
 import Appointments from "./pages/Appointments";
 import { Toaster } from "react-hot-toast";
+import AdminRoute from "./routes/AdminRoute";
+import AuditLogs from "./pages/AuditLogs";
 
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
             <Route path="/patients" element={<Patients />} />
             <Route path="/patients/:id" element={<PatientDetails />} />
             <Route path="/appointments" element={<Appointments />} />
+            <Route path="/audit" element={<AdminRoute><AuditLogs /></AdminRoute>} />
             {/* /patients et /appointments seront ajoutés ensuite */}
           </Route>
         </Routes>

@@ -4,14 +4,16 @@ import { Stethoscope, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const links = [
-  { to: "/", label: "Dashboard", end: true },
-  { to: "/patients", label: "Patients", end: false },
-  { to: "/appointments", label: "Rendez-vous", end: false },
+  { to: "/", label: "Dashboard", end: true, admin: false },
+  { to: "/patients", label: "Patients", end: false, admin: false },
+  { to: "/appointments", label: "Rendez-vous", end: false, admin: false },
+  { to: "/audit", label: "Audit", end: false, admin: true },
 ];
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const visibleLinks = links.filter((l) => !l.admin || user?.role === "admin");
   const initials = user?.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
   const desktopLink = ({ isActive }: { isActive: boolean }) =>
@@ -37,7 +39,7 @@ export default function Layout() {
             </div>
 
             <nav className="hidden md:flex items-center gap-2 rounded-full bg-slate-100 p-1">
-              {links.map((l) => (
+              {visibleLinks.map((l) => (
                 <NavLink key={l.to} to={l.to} end={l.end} className={desktopLink}>
                   {l.label}
                 </NavLink>
@@ -71,7 +73,7 @@ export default function Layout() {
 
           {open && (
             <nav className="md:hidden mt-3 pt-3 border-t border-slate-100 space-y-1">
-              {links.map((l) => (
+              {visibleLinks.map((l) => (
                 <NavLink key={l.to} to={l.to} end={l.end} className={mobileLink} onClick={() => setOpen(false)}>
                   {l.label}
                 </NavLink>
