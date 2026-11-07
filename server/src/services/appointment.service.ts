@@ -1,96 +1,51 @@
-import { AppointmentStatus } from "@prisma/client";
 import { prisma } from "../config/prisma";
-import { AppError } from "../utils/AppError";
 
-const WINDOW_MS = 30 * 60 * 1000;
+const DAY = 24 * 60 * 60 * 1000;
 
-const patientSelect = { select: { id: true, fullName: true, cin: true } };
+export async function getStats() {
+  const now = new Date();
+  const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const endOfDay = new Date(startOfDay.getTime() + DAY);
+  const weekStart = new Date(startOfDay.getTime() - 6 * DAY);
 
-// Règle métier : pas 2 RDV confirmés du même patient à moins de 30 min
-async function assertNoConfirmedConflict(patientId: string, date: Date, excludeId?: string) {
-  const conflict = await prisma.appointment.findFirst({
-    where: {
-      patientId,
-      status: "confirmed",
-      ...(excludeId ? { id: { not: excludeId } } : {}),
-      appointmentDate: {
-        gt: new Date(date.getTime() - WINDOW_MS),
-        lt: new Date(date.getTime() + WINDOW_MS),
-      },
-    },
+  const [totalPatients, todayAppointments, pending, confirmed, cancelled, week, upcoming] =
+    await Promise.all([
+      prisma.patient.count({ where: { deletedAt: null } }),
+      prisma.appointment.count({ where: { appointmentDate: { gte: startOfDay, lt: endOfDay } } }),
+      prisma.appointment.count({ where: { status: "pending" } }),
+      prisma.appointment.count({ where: { status: "confirmed" } }),
+      prisma.appointment.count({ where: { status: "cancelled" } }),
+      prisma.appointment.findMany({
+        where: { appointmentDate: { gte: weekStart, lt: endOfDay } },
+        select: { appointmentDate: true },
+      }),
+      prisma.appointment.findMany({
+        where: { appointmentDate: { gte: now, lt: endOfDay }, status: { not: "cancelled" } },
+        orderBy: { appointmentDate: "asc" },
+        take: 5,
+        include: { patient: { select: { id: true, fullName: true } } },
+      }),
+    ]);
+
+  // Rendez-vous par jour (7 derniers jours)
+  const perDay = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart.getTime() + i * DAY);
+    const key = d.toISOString().slice(0, 10);
+    return { date: key, count: 0 };
   });
-
-  if (conflict) {
-    throw new AppError(
-      409,
-      "Ce patient a déjà un rendez-vous confirmé dans une fenêtre de 30 minutes"
-    );
-  }
-}
-
-export async function createAppointment(
-  data: {
-    patientId: string;
-    appointmentDate: Date;
-    reason: string;
-    notes?: string | null;
-    status: AppointmentStatus;
-  },
-  userId: string
-) {
-  const patient = await prisma.patient.findFirst({
-    where: { id: data.patientId, deletedAt: null },
-  });
-  if (!patient) throw new AppError(404, "Patient introuvable");
-
-  if (data.status === "confirmed") {
-    await assertNoConfirmedConflict(data.patientId, data.appointmentDate);
+  for (const a of week) {
+    const key = a.appointmentDate.toISOString().slice(0, 10);
+    const row = perDay.find((r) => r.date === key);
+    if (row) row.count++;
   }
 
-  return prisma.appointment.create({
-    data: { ...data, createdById: userId },
-    include: { patient: patientSelect },
-  });
-}
-
-export async function listAppointments(filters: {
-  date?: string;
-  status?: AppointmentStatus;
-  patientId?: string;
-}) {
-  const where: any = {};
-
-  if (filters.status) where.status = filters.status;
-  if (filters.patientId) where.patientId = filters.patientId;
-
-  if (filters.date) {
-    const start = new Date(`${filters.date}T00:00:00.000Z`);
-    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-    where.appointmentDate = { gte: start, lt: end };
-  }
-
-  return prisma.appointment.findMany({
-    where,
-    orderBy: { appointmentDate: "asc" },
-    include: { patient: patientSelect },
-  });
-}
-
-export async function updateStatus(id: string, status: AppointmentStatus) {
-  const appointment = await prisma.appointment.findUnique({ where: { id } });
-  if (!appointment) throw new AppError(404, "Rendez-vous introuvable");
-
-  if (status === "confirmed") {
-    await assertNoConfirmedConflict(
-      appointment.patientId,
-      appointment.appointmentDate,
-      appointment.id
-    );
-  }
-
-  return prisma.appointment.update({
-    where: { id },
-    data: { status },
-    include: { patient: patientSelect },
-  });
+  return {
+    totalPatients,
+    todayAppointments,
+    pending,
+    confirmed,
+    cancelled,
+    perDay,
+    upcoming,
+  };
 }
