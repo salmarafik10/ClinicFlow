@@ -10,7 +10,7 @@ interface Props {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+  "w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2.5 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
 
 export default function PatientModal({ patient, onClose, onSaved }: Props) {
   const [form, setForm] = useState({
@@ -46,12 +46,12 @@ export default function PatientModal({ patient, onClose, onSaved }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 p-0 sm:p-4">
-      <form onSubmit={handleSubmit} className="w-full sm:max-w-md max-h-[92vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white p-6 shadow-xl">
+      <form onSubmit={handleSubmit} className="w-full sm:max-w-md max-h-[92vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-xl text-slate-800 dark:text-slate-100">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-slate-800">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
             {patient ? "Modifier le patient" : "Nouveau patient"}
           </h2>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
             <X size={20} />
           </button>
         </div>
@@ -84,7 +84,7 @@ export default function PatientModal({ patient, onClose, onSaved }: Props) {
         </div>
 
         <div className="flex justify-end gap-2 mt-6">
-          <button type="button" onClick={onClose} className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200">
+          <button type="button" onClick={onClose} className="rounded-xl bg-slate-100 dark:bg-slate-700 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600">
             Annuler
           </button>
           <button

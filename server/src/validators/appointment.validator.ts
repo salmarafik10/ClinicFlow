@@ -14,6 +14,8 @@ export const listAppointmentsSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format attendu : YYYY-MM-DD").optional(),
   status: statusEnum.optional(),
   patientId: z.string().uuid().optional(),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().optional(),
 });
 
 export const updateStatusSchema = z.object({

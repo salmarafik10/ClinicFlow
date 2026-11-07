@@ -8,7 +8,7 @@ import { ListSkeleton } from "../components/Skeleton";
 import type { AppUser } from "../types";
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+  "w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2.5 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
 
 export default function Users() {
   const { user: me } = useAuth();
@@ -68,7 +68,7 @@ export default function Users() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Utilisateurs</h1>
-          <p className="text-slate-500 mt-1">{users.length} compte(s)</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">{users.length} compte(s)</p>
         </div>
         <button
           onClick={() => setOpen(true)}
@@ -78,32 +78,32 @@ export default function Users() {
         </button>
       </div>
 
-      <div className="rounded-2xl bg-white shadow-sm">
+      <div className="rounded-2xl bg-white dark:bg-slate-800 shadow-sm">
         {loading ? (
           <ListSkeleton />
         ) : users.length === 0 ? (
           <EmptyState icon={UserCog} title="Aucun utilisateur" />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
             {users.map((u) => (
               <li key={u.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-800 truncate">
+                  <p className="font-semibold text-slate-800 dark:text-slate-100 truncate">
                     {u.fullName} {u.id === me?.id && <span className="text-xs text-slate-400">(vous)</span>}
                   </p>
-                  <p className="text-sm text-slate-500 truncate">{u.email}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{u.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${u.role === "admin" ? "bg-violet-100 text-violet-700" : "bg-blue-100 text-blue-700"}`}>
                     {u.role}
                   </span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${u.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${u.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"}`}>
                     {u.isActive ? "Actif" : "Désactivé"}
                   </span>
                   {u.id !== me?.id && (
                     <button
                       onClick={() => toggleActive(u)}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                      className="rounded-lg border border-slate-200 dark:border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                     >
                       {u.isActive ? "Désactiver" : "Activer"}
                     </button>
@@ -117,10 +117,10 @@ export default function Users() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 p-0 sm:p-4">
-          <form onSubmit={handleCreate} className="w-full sm:max-w-md max-h-[92vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white p-6 shadow-xl">
+          <form onSubmit={handleCreate} className="w-full sm:max-w-md max-h-[92vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-xl text-slate-800 dark:text-slate-100">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-800">Nouvel utilisateur</h2>
-              <button type="button" onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Nouvel utilisateur</h2>
+              <button type="button" onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                 <X size={20} />
               </button>
             </div>
@@ -148,7 +148,7 @@ export default function Users() {
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6">
-              <button type="button" onClick={() => setOpen(false)} className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-200">
+              <button type="button" onClick={() => setOpen(false)} className="rounded-xl bg-slate-100 dark:bg-slate-700 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600">
                 Annuler
               </button>
               <button type="submit" disabled={saving} className="rounded-xl bg-gradient-to-b from-blue-500 to-blue-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">

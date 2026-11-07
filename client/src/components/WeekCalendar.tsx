@@ -13,9 +13,9 @@ const HOURS = Array.from({ length: 11 }, (_, i) => i + 8); // 8h à 18h
 const ROW = 64; // hauteur d'une heure en px
 
 const color: Record<AppointmentStatus, string> = {
-  pending: "bg-amber-50 border-amber-300 text-amber-800",
-  confirmed: "bg-emerald-50 border-emerald-300 text-emerald-800",
-  cancelled: "bg-red-50 border-red-300 text-red-700 opacity-60",
+  pending: "bg-amber-50 border-amber-300 text-amber-800 dark:bg-amber-950/60 dark:border-amber-700 dark:text-amber-200",
+  confirmed: "bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/60 dark:border-emerald-700 dark:text-emerald-200",
+  cancelled: "bg-red-50 border-red-300 text-red-700 dark:bg-red-950/60 dark:border-red-700 dark:text-red-300 opacity-60",
 };
 
 export function startOfWeek(d: Date) {
@@ -39,17 +39,17 @@ export default function WeekCalendar({ appointments, weekStart, onWeekChange, on
   const label = `${days[0].toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} - ${days[6].toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`;
 
   return (
-    <div className="rounded-2xl bg-white shadow-sm">
-      <div className="flex items-center justify-between p-4 border-b border-slate-100">
-        <p className="font-bold text-slate-800">{label}</p>
+    <div className="rounded-2xl bg-white dark:bg-slate-800 shadow-sm">
+      <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-700">
+        <p className="font-bold text-slate-800 dark:text-slate-100">{label}</p>
         <div className="flex items-center gap-2">
-          <button onClick={() => onWeekChange(startOfWeek(new Date()))} className="rounded-full bg-slate-100 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200">
+          <button onClick={() => onWeekChange(startOfWeek(new Date()))} className="rounded-full bg-slate-100 dark:bg-slate-700 px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600">
             Aujourd'hui
           </button>
-          <button onClick={() => shift(-1)} className="grid place-items-center w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200">
+          <button onClick={() => shift(-1)} className="grid place-items-center w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200">
             <ChevronLeft size={16} />
           </button>
-          <button onClick={() => shift(1)} className="grid place-items-center w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200">
+          <button onClick={() => shift(1)} className="grid place-items-center w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -57,10 +57,10 @@ export default function WeekCalendar({ appointments, weekStart, onWeekChange, on
 
       <div className="overflow-x-auto">
         <div className="min-w-[760px]">
-          <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-slate-100">
+          <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-slate-100 dark:border-slate-700">
             <div />
             {days.map((d) => (
-              <div key={d.toISOString()} className={`py-2 text-center text-xs ${sameDay(d, today) ? "text-blue-600 font-bold" : "text-slate-500"}`}>
+              <div key={d.toISOString()} className={`py-2 text-center text-xs ${sameDay(d, today) ? "text-blue-600 dark:text-blue-400 font-bold" : "text-slate-500 dark:text-slate-400"}`}>
                 {d.toLocaleDateString("fr-FR", { weekday: "short" })}
                 <p className="text-base font-semibold">{d.getDate()}</p>
               </div>
@@ -70,7 +70,7 @@ export default function WeekCalendar({ appointments, weekStart, onWeekChange, on
           <div className="grid grid-cols-[56px_repeat(7,1fr)]">
             <div>
               {HOURS.map((h) => (
-                <div key={h} style={{ height: ROW }} className="pr-2 text-right text-xs text-slate-400 -translate-y-2">
+                <div key={h} style={{ height: ROW }} className="pr-2 text-right text-xs text-slate-400 dark:text-slate-500 -translate-y-2">
                   {h}:00
                 </div>
               ))}
@@ -79,9 +79,9 @@ export default function WeekCalendar({ appointments, weekStart, onWeekChange, on
             {days.map((d) => {
               const dayItems = appointments.filter((a) => sameDay(new Date(a.appointmentDate), d));
               return (
-                <div key={d.toISOString()} className="relative border-l border-slate-100" style={{ height: HOURS.length * ROW }}>
+                <div key={d.toISOString()} className="relative border-l border-slate-100 dark:border-slate-700" style={{ height: HOURS.length * ROW }}>
                   {HOURS.map((h, i) => (
-                    <div key={h} style={{ top: i * ROW, height: ROW }} className="absolute inset-x-0 border-t border-slate-100" />
+                    <div key={h} style={{ top: i * ROW, height: ROW }} className="absolute inset-x-0 border-t border-slate-100 dark:border-slate-700" />
                   ))}
                   {dayItems.map((a) => {
                     const t = new Date(a.appointmentDate);

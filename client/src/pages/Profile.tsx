@@ -4,7 +4,7 @@ import { api } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+  "w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2.5 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -39,14 +39,14 @@ export default function Profile() {
     <div className="max-w-lg">
       <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Mon profil</h1>
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm mt-6">
-        <p className="font-semibold text-slate-800">{user?.fullName}</p>
-        <p className="text-sm text-slate-500">{user?.email}</p>
+      <div className="rounded-2xl bg-white dark:bg-slate-800 p-5 shadow-sm mt-6">
+        <p className="font-semibold text-slate-800 dark:text-slate-100">{user?.fullName}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
         <p className="text-xs text-slate-400 capitalize mt-1">Rôle : {user?.role}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl bg-white p-5 shadow-sm mt-4">
-        <h2 className="font-bold text-slate-800 mb-4">Changer le mot de passe</h2>
+      <form onSubmit={handleSubmit} className="rounded-2xl bg-white dark:bg-slate-800 p-5 shadow-sm mt-4">
+        <h2 className="font-bold text-slate-800 dark:text-slate-100 mb-4">Changer le mot de passe</h2>
         {error && <div className="mb-3 rounded-xl bg-red-50 text-red-700 text-sm px-3 py-2">{error}</div>}
         <div className="space-y-3">
           <div>

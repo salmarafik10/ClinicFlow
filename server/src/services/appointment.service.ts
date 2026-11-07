@@ -56,6 +56,8 @@ export async function listAppointments(filters: {
   date?: string;
   status?: AppointmentStatus;
   patientId?: string;
+  page?: number;
+  limit?: number;
 }) {
   const where: any = {};
 
@@ -66,6 +68,22 @@ export async function listAppointments(filters: {
     const start = new Date(`${filters.date}T00:00:00.000Z`);
     const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
     where.appointmentDate = { gte: start, lt: end };
+  }
+
+  if (filters.page) {
+    const page = filters.page;
+    const limit = filters.limit ?? 10;
+    const [items, total] = await Promise.all([
+      prisma.appointment.findMany({
+        where,
+        orderBy: { appointmentDate: "asc" },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { patient: patientSelect },
+      }),
+      prisma.appointment.count({ where }),
+    ]);
+    return { items, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
   return prisma.appointment.findMany({

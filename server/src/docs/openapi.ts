@@ -136,6 +136,8 @@ export const openApiSpec = {
         parameters: [
           { name: "date", in: "query", schema: { type: "string", format: "date" } },
           { name: "status", in: "query", schema: { type: "string", enum: ["pending", "confirmed", "cancelled"] } },
+          { name: "page", in: "query", schema: { type: "integer", default: 1 } },
+          { name: "limit", in: "query", schema: { type: "integer", default: 10 } },
         ],
         responses: { "200": ok("Liste"), "401": errors["401"] },
       },

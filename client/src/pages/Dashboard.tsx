@@ -54,20 +54,20 @@ export default function Dashboard() {
   return (
     <div>
       <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Dashboard</h1>
-      <p className="text-slate-500 mt-1 mb-6">Vue d'ensemble de votre clinique</p>
+      <p className="text-slate-500 dark:text-slate-400 mt-1 mb-6">Vue d'ensemble de votre clinique</p>
 
       {error && <div className="mb-4 rounded-xl bg-red-50 text-red-700 text-sm px-4 py-3">{error}</div>}
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {cards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
+          <div key={label} className="rounded-2xl bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
             <span className={`grid place-items-center w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-xl ${color}`}>
               <Icon size={22} />
             </span>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-slate-500 truncate">{label}</p>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">{label}</p>
               {stats ? (
-                <p className="text-2xl font-bold text-slate-800">{value}</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{value}</p>
               ) : (
                 <Skeleton className="h-7 w-10 mt-1" />
               )}
@@ -77,8 +77,8 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 mt-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="font-bold text-slate-800 mb-4">Rendez-vous des 7 derniers jours</h2>
+        <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-800 p-5 shadow-sm">
+          <h2 className="font-bold text-slate-800 dark:text-slate-100 mb-4">Rendez-vous des 7 derniers jours</h2>
           <div className="h-64">
             {stats ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -95,8 +95,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="font-bold text-slate-800 mb-4">Répartition par statut</h2>
+        <div className="rounded-2xl bg-white dark:bg-slate-800 p-5 shadow-sm">
+          <h2 className="font-bold text-slate-800 dark:text-slate-100 mb-4">Répartition par statut</h2>
           <div className="h-64">
             {stats ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -113,7 +113,7 @@ export default function Dashboard() {
               <Skeleton className="h-full w-full" />
             )}
           </div>
-          <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600">
+          <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600 dark:text-slate-400">
             {pie.map((p, i) => (
               <span key={p.name} className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i] }} />
@@ -124,23 +124,23 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm mt-4">
-        <h2 className="font-bold text-slate-800 mb-3">Prochains rendez-vous d'aujourd'hui</h2>
+      <div className="rounded-2xl bg-white dark:bg-slate-800 p-5 shadow-sm mt-4">
+        <h2 className="font-bold text-slate-800 dark:text-slate-100 mb-3">Prochains rendez-vous d'aujourd'hui</h2>
         {!stats ? (
           <Skeleton className="h-16 w-full" />
         ) : stats.upcoming.length === 0 ? (
           <EmptyState icon={CalendarX} title="Aucun rendez-vous à venir aujourd'hui" />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
             {stats.upcoming.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <Link to={`/patients/${a.patient.id}`} className="font-medium text-slate-800 hover:text-blue-600 truncate block">
+                  <Link to={`/patients/${a.patient.id}`} className="font-medium text-slate-800 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 truncate block">
                     {a.patient.fullName}
                   </Link>
-                  <p className="text-xs text-slate-500 truncate">{a.reason}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{a.reason}</p>
                 </div>
-                <span className="shrink-0 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1">
+                <span className="shrink-0 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-sm font-semibold px-3 py-1">
                   {new Date(a.appointmentDate).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </li>

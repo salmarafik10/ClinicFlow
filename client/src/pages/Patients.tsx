@@ -12,7 +12,7 @@ import type { Patient, Pagination } from "../types";
 import { downloadCsv } from "../utils/csv";
 import ActionButton from "../components/ActionButtons";
 
-const LIMIT = 8;
+const LIMIT = 10;
 
 export default function Patients() {
   const { user } = useAuth();
@@ -91,14 +91,14 @@ export default function Patients() {
 
   const actions = (p: Patient) => (
     <div className="flex gap-1">
-      <Link to={`/patients/${p.id}`} title="Détails" className="grid place-items-center w-9 h-9 rounded-full text-slate-500 hover:bg-blue-50 hover:text-blue-600">
+      <Link to={`/patients/${p.id}`} title="Détails" className="grid place-items-center w-9 h-9 rounded-full text-slate-500 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400">
         <Eye size={17} />
       </Link>
-      <button onClick={() => setModal({ open: true, patient: p })} title="Modifier" className="grid place-items-center w-9 h-9 rounded-full text-slate-500 hover:bg-amber-50 hover:text-amber-600">
+      <button onClick={() => setModal({ open: true, patient: p })} title="Modifier" className="grid place-items-center w-9 h-9 rounded-full text-slate-500 hover:bg-amber-50 hover:text-amber-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-amber-400">
         <Pencil size={17} />
       </button>
       {isAdmin && (
-        <button onClick={() => setToDelete(p)} title="Supprimer" className="grid place-items-center w-9 h-9 rounded-full text-slate-500 hover:bg-red-50 hover:text-red-600">
+        <button onClick={() => setToDelete(p)} title="Supprimer" className="grid place-items-center w-9 h-9 rounded-full text-slate-500 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-red-400">
           <Trash2 size={17} />
         </button>
       )}
@@ -119,7 +119,7 @@ export default function Patients() {
       <div className="flex items-center justify-between gap-3 mb-6">
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Patients</h1>
-          <p className="text-slate-500 mt-1">{pagination?.total ?? 0} patient(s)</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">{pagination?.total ?? 0} patient(s)</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <ActionButton
@@ -143,7 +143,7 @@ export default function Patients() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Rechercher par nom ou CIN"
-          className="w-full rounded-full border border-slate-200 bg-white pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-full border border-slate-200 bg-white pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
         />
       </div>
         {isAdmin && (
@@ -152,27 +152,27 @@ export default function Patients() {
         if (!showDeleted) loadDeleted();
         setShowDeleted(!showDeleted);
       }}
-      className="mb-4 text-sm font-medium text-slate-500 hover:text-blue-600"
+      className="mb-4 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
     >
       {showDeleted ? "Masquer" : "Voir"} les patients supprimés
     </button>
   )}
 
   {showDeleted && (
-    <div className="rounded-2xl bg-white shadow-sm mb-4">
+    <div className="rounded-2xl bg-white dark:bg-slate-800 shadow-sm mb-4">
       {deleted.length === 0 ? (
         <p className="p-5 text-sm text-slate-400">Aucun patient supprimé</p>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-slate-100 dark:divide-slate-700">
           {deleted.map((p) => (
             <li key={p.id} className="flex items-center justify-between gap-3 px-5 py-3">
               <div className="min-w-0">
-                <p className="font-medium text-slate-800 truncate">{p.fullName}</p>
-                <p className="text-xs text-slate-500">CIN : {p.cin}</p>
+                <p className="font-medium text-slate-800 dark:text-slate-100 truncate">{p.fullName}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">CIN : {p.cin}</p>
               </div>
               <button
                 onClick={() => restore(p)}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-700"
               >
                 <RotateCcw size={14} /> Restaurer
               </button>
@@ -183,7 +183,7 @@ export default function Patients() {
     </div>
   )}
 
-      <div className="rounded-2xl bg-white shadow-sm">
+      <div className="rounded-2xl bg-white dark:bg-slate-800 shadow-sm">
         {loading ? (
           <ListSkeleton />
         ) : items.length === 0 ? (
@@ -198,7 +198,7 @@ export default function Patients() {
             {/* Tableau (desktop) */}
             <table className="hidden md:table w-full text-sm">
               <thead>
-                <tr className="text-left text-slate-500 border-b border-slate-100">
+                <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
                   <th className="px-5 py-3 font-medium">Nom</th>
                   <th className="px-5 py-3 font-medium">CIN</th>
                   <th className="px-5 py-3 font-medium">Téléphone</th>
@@ -208,11 +208,11 @@ export default function Patients() {
               </thead>
               <tbody>
                 {items.map((p) => (
-                  <tr key={p.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
-                    <td className="px-5 py-3 font-medium text-slate-800">{p.fullName}</td>
-                    <td className="px-5 py-3">{p.cin}</td>
-                    <td className="px-5 py-3">{p.phone}</td>
-                    <td className="px-5 py-3">{new Date(p.birthDate).toLocaleDateString("fr-FR")}</td>
+                  <tr key={p.id} className="border-b border-slate-50 dark:border-slate-700/50 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                    <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{p.fullName}</td>
+                    <td className="px-5 py-3 text-slate-700 dark:text-slate-300">{p.cin}</td>
+                    <td className="px-5 py-3 text-slate-700 dark:text-slate-300">{p.phone}</td>
+                    <td className="px-5 py-3 text-slate-700 dark:text-slate-300">{new Date(p.birthDate).toLocaleDateString("fr-FR")}</td>
                     <td className="px-5 py-3"><div className="flex justify-end">{actions(p)}</div></td>
                   </tr>
                 ))}
@@ -220,14 +220,14 @@ export default function Patients() {
             </table>
 
             {/* Cartes (mobile) */}
-            <ul className="md:hidden divide-y divide-slate-100">
+            <ul className="md:hidden divide-y divide-slate-100 dark:divide-slate-700">
               {items.map((p) => (
                 <li key={p.id} className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-800 truncate">{p.fullName}</p>
-                      <p className="text-xs text-slate-500">CIN : {p.cin}</p>
-                      <p className="mt-1 flex items-center gap-1 text-sm text-slate-600">
+                      <p className="font-semibold text-slate-800 dark:text-slate-100 truncate">{p.fullName}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">CIN : {p.cin}</p>
+                      <p className="mt-1 flex items-center gap-1 text-sm text-slate-600 dark:text-slate-300">
                         <Phone size={14} /> {p.phone}
                       </p>
                     </div>
@@ -242,12 +242,12 @@ export default function Patients() {
 
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-slate-500">Page {pagination.page} sur {pagination.totalPages}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Page {pagination.page} sur {pagination.totalPages}</p>
           <div className="flex gap-2">
-            <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="grid place-items-center w-10 h-10 rounded-full bg-white shadow-sm disabled:opacity-40">
+            <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="grid place-items-center w-10 h-10 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-sm disabled:opacity-40">
               <ChevronLeft size={18} />
             </button>
-            <button disabled={page >= pagination.totalPages} onClick={() => setPage((p) => p + 1)} className="grid place-items-center w-10 h-10 rounded-full bg-white shadow-sm disabled:opacity-40">
+            <button disabled={page >= pagination.totalPages} onClick={() => setPage((p) => p + 1)} className="grid place-items-center w-10 h-10 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-sm disabled:opacity-40">
               <ChevronRight size={18} />
             </button>
           </div>
