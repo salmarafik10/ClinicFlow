@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
-import { Users, CalendarDays, Clock, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Users, CalendarDays, Clock, CheckCircle2, CalendarX } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
+} from "recharts";
 import { api } from "../api/axios";
+import { Skeleton } from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
 
 interface Stats {
   totalPatients: number;
   todayAppointments: number;
   pending: number;
   confirmed: number;
+  cancelled: number;
+  perDay: { date: string; count: number }[];
+  upcoming: { id: string; appointmentDate: string; reason: string; status: string; patient: { id: string; fullName: string } }[];
 }
+
+const COLORS = ["#f59e0b", "#10b981", "#ef4444"];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -27,25 +38,115 @@ export default function Dashboard() {
     { label: "Confirmés", value: stats?.confirmed, icon: CheckCircle2, color: "bg-emerald-100 text-emerald-600" },
   ];
 
+  const chartDays = stats?.perDay.map((d) => ({
+    day: new Date(d.date).toLocaleDateString("fr-FR", { weekday: "short", timeZone: "UTC" }),
+    count: d.count,
+  }));
+
+  const pie = stats
+    ? [
+        { name: "En attente", value: stats.pending },
+        { name: "Confirmés", value: stats.confirmed },
+        { name: "Annulés", value: stats.cancelled },
+      ]
+    : [];
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-blue-600">Dashboard</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Dashboard</h1>
       <p className="text-slate-500 mt-1 mb-6">Vue d'ensemble de votre clinique</p>
 
       {error && <div className="mb-4 rounded-xl bg-red-50 text-red-700 text-sm px-4 py-3">{error}</div>}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {cards.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="rounded-2xl bg-white p-5 shadow-sm flex items-center gap-4">
-            <span className={`grid place-items-center w-12 h-12 rounded-xl ${color}`}>
+          <div key={label} className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
+            <span className={`grid place-items-center w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-xl ${color}`}>
               <Icon size={22} />
             </span>
-            <div>
-              <p className="text-sm text-slate-500">{label}</p>
-              <p className="text-2xl font-bold text-slate-800">{value ?? "—"}</p>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm text-slate-500 truncate">{label}</p>
+              {stats ? (
+                <p className="text-2xl font-bold text-slate-800">{value}</p>
+              ) : (
+                <Skeleton className="h-7 w-10 mt-1" />
+              )}
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="grid gap-4 mt-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 rounded-2xl bg-white p-5 shadow-sm">
+          <h2 className="font-bold text-slate-800 mb-4">Rendez-vous des 7 derniers jours</h2>
+          <div className="h-64">
+            {stats ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartDays}>
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={28} />
+                  <Tooltip cursor={{ fill: "#eff6ff" }} />
+                  <Bar dataKey="count" name="Rendez-vous" fill="#2563eb" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <Skeleton className="h-full w-full" />
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <h2 className="font-bold text-slate-800 mb-4">Répartition par statut</h2>
+          <div className="h-64">
+            {stats ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={pie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={3}>
+                    {pie.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <Skeleton className="h-full w-full" />
+            )}
+          </div>
+          <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600">
+            {pie.map((p, i) => (
+              <span key={p.name} className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i] }} />
+                {p.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-white p-5 shadow-sm mt-4">
+        <h2 className="font-bold text-slate-800 mb-3">Prochains rendez-vous d'aujourd'hui</h2>
+        {!stats ? (
+          <Skeleton className="h-16 w-full" />
+        ) : stats.upcoming.length === 0 ? (
+          <EmptyState icon={CalendarX} title="Aucun rendez-vous à venir aujourd'hui" />
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {stats.upcoming.map((a) => (
+              <li key={a.id} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <Link to={`/patients/${a.patient.id}`} className="font-medium text-slate-800 hover:text-blue-600 truncate block">
+                    {a.patient.fullName}
+                  </Link>
+                  <p className="text-xs text-slate-500 truncate">{a.reason}</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1">
+                  {new Date(a.appointmentDate).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
