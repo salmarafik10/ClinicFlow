@@ -43,7 +43,7 @@ export default function PatientDetails() {
         <ArrowLeft size={16} /> Retour aux patients
       </Link>
 
-      <h1 className="text-3xl font-bold text-blue-600 mb-6">{patient.fullName}</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-6">{patient.fullName}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {infos.map(({ icon: Icon, label, value }) => (
