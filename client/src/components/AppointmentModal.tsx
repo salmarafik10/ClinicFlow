@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
 import { api } from "../api/axios";
 import type { Patient, Appointment, AppointmentStatus } from "../types";
+import Select from "./Select";
 
 interface Props {
   appointment?: Appointment | null; // null/undefined = création
@@ -47,6 +48,11 @@ export default function AppointmentModal({ appointment, onClose, onSaved }: Prop
     e.preventDefault();
     setError("");
     setSaving(true);
+    if (!editing && !form.patientId) {
+      setError("Veuillez choisir un patient");
+      setSaving(false);
+      return;
+    }
     try {
       const date = new Date(form.appointmentDate).toISOString();
       if (editing) {
@@ -90,14 +96,12 @@ export default function AppointmentModal({ appointment, onClose, onSaved }: Prop
             {editing ? (
               <input className={inputClass} disabled value={appointment!.patient?.fullName ?? ""} />
             ) : (
-              <select className={inputClass} required value={form.patientId} onChange={(e) => set("patientId", e.target.value)}>
-                <option value="">Choisir un patient</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.fullName} ({p.cin})
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={form.patientId}
+                options={[{ value: "", label: "Choisir un patient" }, ...patients.map((p) => ({ value: p.id, label: `${p.fullName} (${p.cin})` }))]}
+                onChange={(v) => set("patientId", v)}
+                className="[&>button]:rounded-xl [&>button]:py-2.5"
+              />
             )}
           </div>
           <div>
@@ -111,10 +115,15 @@ export default function AppointmentModal({ appointment, onClose, onSaved }: Prop
           {!editing && (
             <div>
               <label className="block text-sm font-medium mb-1">Statut</label>
-              <select className={inputClass} value={form.status} onChange={(e) => set("status", e.target.value)}>
-                <option value="pending">En attente</option>
-                <option value="confirmed">Confirmé</option>
-              </select>
+              <Select
+                value={form.status}
+                options={[
+                  { value: "pending", label: "En attente" },
+                  { value: "confirmed", label: "Confirmé" },
+                ]}
+                onChange={(v) => set("status", v)}
+                className="[&>button]:rounded-xl [&>button]:py-2.5"
+              />
             </div>
           )}
           <div>

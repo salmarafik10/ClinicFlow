@@ -10,6 +10,7 @@ import EmptyState from "../components/EmptyState";
 import { ListSkeleton } from "../components/Skeleton";
 import type { Patient, Pagination } from "../types";
 import { downloadCsv } from "../utils/csv";
+import ActionButton from "../components/ActionButtons";
 
 const LIMIT = 8;
 
@@ -115,23 +116,25 @@ export default function Patients() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Patients</h1>
           <p className="text-slate-500 mt-1">{pagination?.total ?? 0} patient(s)</p>
         </div>
-        {addButton}
-        <button
-  onClick={() =>
-    downloadCsv("patients.csv", [
-      ["Nom", "CIN", "Téléphone", "Naissance", "Adresse"],
-      ...items.map((p) => [p.fullName, p.cin, p.phone, new Date(p.birthDate).toLocaleDateString("fr-FR"), p.address]),
-    ])
-  }
-  className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50"
->
-  <Download size={16} /> Exporter CSV
-</button>
+        <div className="flex items-center gap-2 shrink-0">
+          <ActionButton
+            icon={Download}
+            label="Exporter CSV"
+            variant="ghost"
+            onClick={() =>
+              downloadCsv("patients.csv", [
+                ["Nom", "CIN", "Téléphone", "Naissance", "Adresse"],
+                ...items.map((p) => [p.fullName, p.cin, p.phone, new Date(p.birthDate).toLocaleDateString("fr-FR"), p.address]),
+              ])
+            }
+          />
+          <ActionButton icon={Plus} label="Nouveau patient" onClick={() => setModal({ open: true, patient: null })} />
+        </div>
       </div>
 
       <div className="relative mb-4 w-full sm:max-w-sm">
