@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState, type FormEvent } from "react";
 import { X } from "lucide-react";
 import { api } from "../api/axios";
 import type { Patient } from "../types";
