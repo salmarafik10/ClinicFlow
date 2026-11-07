@@ -10,9 +10,19 @@ import { ListSkeleton } from "../components/Skeleton";
 import type { Appointment, AppointmentStatus } from "../types";
 import WeekCalendar, { startOfWeek } from "../components/WeekCalendar";
 import { downloadCsv } from "../utils/csv";
+import Select from "../components/Select";
+import ActionButton from "../components/ActionButtons";
 
 const fmt = (d: string) =>
   new Date(d).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
+
+const STATUS_FILTER = [
+  { value: "", label: "Tous les statuts" },
+  { value: "pending", label: "En attente" },
+  { value: "confirmed", label: "Confirmé" },
+  { value: "cancelled", label: "Annulé" },
+];
+const STATUS_EDIT = STATUS_FILTER.slice(1);
 
 export default function Appointments() {
   const [items, setItems] = useState<Appointment[]>([]);
@@ -53,29 +63,25 @@ export default function Appointments() {
     }
   }
 
-  const field =
-    "w-full sm:w-auto rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
-
   const statusSelect = (a: Appointment) => (
-  <div className="flex items-center gap-2 md:justify-end">
-    <select
-      value={a.status}
-      onChange={(e) => changeStatus(a.id, e.target.value as AppointmentStatus)}
-      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs"
-    >
-      <option value="pending">En attente</option>
-      <option value="confirmed">Confirmé</option>
-      <option value="cancelled">Annulé</option>
-    </select>
-    <button
-      onClick={() => setEditing(a)}
-      title="Modifier"
-      className="grid place-items-center w-8 h-8 rounded-full text-slate-500 hover:bg-amber-50 hover:text-amber-600"
-    >
-      <Pencil size={16} />
-    </button>
-  </div>
-);
+    <div className="flex items-center gap-2 md:justify-end">
+      <Select
+        size="sm"
+        align="right"
+        value={a.status}
+        options={STATUS_EDIT}
+        onChange={(v) => changeStatus(a.id, v as AppointmentStatus)}
+        className="w-36"
+      />
+      <button
+        onClick={() => setEditing(a)}
+        title="Modifier"
+        className="grid place-items-center w-8 h-8 rounded-full text-slate-500 hover:bg-amber-50 hover:text-amber-600"
+      >
+        <Pencil size={16} />
+      </button>
+    </div>
+  );
 
   const addButton = (
     <button
@@ -88,43 +94,45 @@ export default function Appointments() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Rendez-vous</h1>
           <p className="text-slate-500 mt-1">{items.length} rendez-vous</p>
         </div>
-        {addButton}
-        <button
-  onClick={() =>
-    downloadCsv("rendez-vous.csv", [
-      ["Date", "Patient", "CIN", "Motif", "Statut", "Notes"],
-      ...items.map((a) => [
-        new Date(a.appointmentDate).toLocaleString("fr-FR"),
-        a.patient?.fullName, a.patient?.cin, a.reason, a.status, a.notes,
-      ]),
-    ])
-  }
-  className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50"
->
-  <Download size={16} /> Exporter CSV
-</button>
+        <div className="flex items-center gap-2 shrink-0">
+          <ActionButton
+            icon={Download}
+            label="Exporter CSV"
+            variant="ghost"
+            onClick={() =>
+              downloadCsv("rendez-vous.csv", [
+                ["Date", "Patient", "CIN", "Motif", "Statut", "Notes"],
+                ...items.map((a) => [
+                  new Date(a.appointmentDate).toLocaleString("fr-FR"),
+                  a.patient?.fullName, a.patient?.cin, a.reason, a.status, a.notes,
+                ]),
+              ])
+            }
+          />
+          <ActionButton icon={Plus} label="Nouveau rendez-vous" onClick={() => setModalOpen(true)} />
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-4">
-        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field} />
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className={field}>
-          <option value="">Tous les statuts</option>
-          <option value="pending">En attente</option>
-          <option value="confirmed">Confirmé</option>
-          <option value="cancelled">Annulé</option>
-        </select>
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2 sm:gap-3 mb-4">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="col-span-1 w-full sm:w-auto rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+        />
+        <Select value={status} options={STATUS_FILTER} onChange={setStatus} className="col-span-1 sm:w-52" />
         {(date || status) && (
           <button
             onClick={() => {
               setDate("");
               setStatus("");
             }}
-            className="rounded-full bg-slate-100 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-200"
+            className="col-span-2 sm:col-span-1 rounded-full bg-slate-100 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200"
           >
             Réinitialiser
           </button>
