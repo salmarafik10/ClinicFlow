@@ -8,6 +8,7 @@ const links = [
   { to: "/patients", label: "Patients", end: false, admin: false },
   { to: "/appointments", label: "Rendez-vous", end: false, admin: false },
   { to: "/audit", label: "Audit", end: false, admin: true },
+  { to: "/users", label: "Utilisateurs", end: false, admin: true },
 ];
 
 export default function Layout() {
@@ -51,9 +52,9 @@ export default function Layout() {
                 <p className="text-sm font-semibold text-slate-800">{user?.fullName}</p>
                 <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
               </div>
-              <span className="grid place-items-center w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm">
+              <NavLink to="/profile" title="Mon profil" className="grid place-items-center w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm hover:bg-blue-200">
                 {initials}
-              </span>
+              </NavLink>
               <button
                 onClick={logout}
                 title="Déconnexion"

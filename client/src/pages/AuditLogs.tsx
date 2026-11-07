@@ -19,6 +19,7 @@ const actionLabel: Record<string, string> = {
   DELETE: "Suppression",
   STATUS_CHANGE: "Changement de statut",
   RESTORE: "Restauration",
+  
 };
 
 const entityLabel: Record<string, string> = { patient: "Patient", appointment: "Rendez-vous" };
