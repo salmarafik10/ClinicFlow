@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Trash2, Eye, ChevronLeft, ChevronRight, Users, Phone } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, ChevronLeft, ChevronRight, Users, Phone, RotateCcw} from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -24,6 +24,8 @@ export default function Patients() {
   const [modal, setModal] = useState<{ open: boolean; patient: Patient | null }>({ open: false, patient: null });
   const [toDelete, setToDelete] = useState<Patient | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleted, setShowDeleted] = useState(false);
+  const [deleted, setDeleted] = useState<Patient[]>([]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -43,6 +45,26 @@ export default function Patients() {
       toast.error("Impossible de charger les patients");
     } finally {
       setLoading(false);
+    }
+  }
+
+    async function loadDeleted() {
+    try {
+      const { data } = await api.get("/patients/deleted");
+      setDeleted(data);
+    } catch {
+      toast.error("Impossible de charger les patients supprimés");
+    }
+  }
+
+  async function restore(p: Patient) {
+    try {
+      await api.patch(`/patients/${p.id}/restore`);
+      toast.success("Patient restauré");
+      loadDeleted();
+      load();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message ?? "Restauration impossible");
     }
   }
 
@@ -109,6 +131,42 @@ export default function Patients() {
           className="w-full rounded-full border border-slate-200 bg-white pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
+        {isAdmin && (
+    <button
+      onClick={() => {
+        if (!showDeleted) loadDeleted();
+        setShowDeleted(!showDeleted);
+      }}
+      className="mb-4 text-sm font-medium text-slate-500 hover:text-blue-600"
+    >
+      {showDeleted ? "Masquer" : "Voir"} les patients supprimés
+    </button>
+  )}
+
+  {showDeleted && (
+    <div className="rounded-2xl bg-white shadow-sm mb-4">
+      {deleted.length === 0 ? (
+        <p className="p-5 text-sm text-slate-400">Aucun patient supprimé</p>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {deleted.map((p) => (
+            <li key={p.id} className="flex items-center justify-between gap-3 px-5 py-3">
+              <div className="min-w-0">
+                <p className="font-medium text-slate-800 truncate">{p.fullName}</p>
+                <p className="text-xs text-slate-500">CIN : {p.cin}</p>
+              </div>
+              <button
+                onClick={() => restore(p)}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
+              >
+                <RotateCcw size={14} /> Restaurer
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )}
 
       <div className="rounded-2xl bg-white shadow-sm">
         {loading ? (

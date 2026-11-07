@@ -10,6 +10,7 @@ const actionStyle: Record<string, string> = {
   UPDATE: "bg-blue-100 text-blue-700",
   DELETE: "bg-red-100 text-red-700",
   STATUS_CHANGE: "bg-amber-100 text-amber-700",
+  RESTORE: "bg-teal-100 text-teal-700",
 };
 
 const actionLabel: Record<string, string> = {
@@ -17,6 +18,7 @@ const actionLabel: Record<string, string> = {
   UPDATE: "Modification",
   DELETE: "Suppression",
   STATUS_CHANGE: "Changement de statut",
+  RESTORE: "Restauration",
 };
 
 const entityLabel: Record<string, string> = { patient: "Patient", appointment: "Rendez-vous" };
