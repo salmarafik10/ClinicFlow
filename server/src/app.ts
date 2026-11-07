@@ -9,6 +9,7 @@ import patientRoutes from "./routes/patient.routes";
 import appointmentRoutes from "./routes/appointment.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import auditRoutes from "./routes/audit.routes";
+import userRoutes from "./routes/user.routes";
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/patients", patientRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/audit-logs", auditRoutes);
+app.use("/api/users", userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
