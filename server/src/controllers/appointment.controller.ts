@@ -5,6 +5,7 @@ import {
   createAppointmentSchema,
   listAppointmentsSchema,
   updateStatusSchema,
+  updateAppointmentSchema,
 } from "../validators/appointment.validator";
 
 export async function create(req: Request, res: Response) {
@@ -17,8 +18,15 @@ export async function list(req: Request, res: Response) {
   res.json(await service.listAppointments(filters));
 }
 
+export async function update(req: Request, res: Response) {
+  const { id } = idParamSchema.parse(req.params);
+  const data = updateAppointmentSchema.parse(req.body);
+  res.json(await service.updateAppointment(id, data, req.user!.id));
+}
+
 export async function patchStatus(req: Request, res: Response) {
   const { id } = idParamSchema.parse(req.params);
   const { status } = updateStatusSchema.parse(req.body);
-  res.json(await service.updateStatus(id, status));
+  res.json(await service.updateStatus(id, status, req.user!.id));
 }
+

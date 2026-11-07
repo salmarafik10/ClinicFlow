@@ -19,3 +19,9 @@ export const listAppointmentsSchema = z.object({
 export const updateStatusSchema = z.object({
   status: statusEnum,
 });
+
+export const updateAppointmentSchema = z.object({
+  appointmentDate: z.coerce.date().optional(),
+  reason: z.string().trim().min(2).max(255).optional(),
+  notes: z.string().trim().max(1000).optional().nullable(),
+});

@@ -9,5 +9,6 @@ router.use(authenticate);
 router.post("/", controller.create);
 router.get("/", controller.list);
 router.patch("/:id/status", controller.patchStatus);
+router.put("/:id", controller.update);
 
 export default router;

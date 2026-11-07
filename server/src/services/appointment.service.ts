@@ -1,12 +1,11 @@
 import { AppointmentStatus } from "@prisma/client";
 import { prisma } from "../config/prisma";
 import { AppError } from "../utils/AppError";
+import { logAction } from "./audit.service";
 
 const WINDOW_MS = 30 * 60 * 1000;
-
 const patientSelect = { select: { id: true, fullName: true, cin: true } };
 
-// Règle métier : pas 2 RDV confirmés du même patient à moins de 30 min
 async function assertNoConfirmedConflict(patientId: string, date: Date, excludeId?: string) {
   const conflict = await prisma.appointment.findFirst({
     where: {
@@ -21,10 +20,7 @@ async function assertNoConfirmedConflict(patientId: string, date: Date, excludeI
   });
 
   if (conflict) {
-    throw new AppError(
-      409,
-      "Ce patient a déjà un rendez-vous confirmé dans une fenêtre de 30 minutes"
-    );
+    throw new AppError(409, "Ce patient a déjà un rendez-vous confirmé dans une fenêtre de 30 minutes");
   }
 }
 
@@ -38,19 +34,22 @@ export async function createAppointment(
   },
   userId: string
 ) {
-  const patient = await prisma.patient.findFirst({
-    where: { id: data.patientId, deletedAt: null },
-  });
+  const patient = await prisma.patient.findFirst({ where: { id: data.patientId, deletedAt: null } });
   if (!patient) throw new AppError(404, "Patient introuvable");
 
   if (data.status === "confirmed") {
     await assertNoConfirmedConflict(data.patientId, data.appointmentDate);
   }
 
-  return prisma.appointment.create({
+  const appointment = await prisma.appointment.create({
     data: { ...data, createdById: userId },
     include: { patient: patientSelect },
   });
+  await logAction(userId, "CREATE", "appointment", appointment.id, {
+    patient: patient.fullName,
+    status: appointment.status,
+  });
+  return appointment;
 }
 
 export async function listAppointments(filters: {
@@ -76,21 +75,41 @@ export async function listAppointments(filters: {
   });
 }
 
-export async function updateStatus(id: string, status: AppointmentStatus) {
+export async function updateAppointment(
+  id: string,
+  data: { appointmentDate?: Date; reason?: string; notes?: string | null },
+  userId: string
+) {
+  const existing = await prisma.appointment.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, "Rendez-vous introuvable");
+
+  // Un RDV confirmé qui change d'heure doit respecter la règle des 30 minutes
+  if (existing.status === "confirmed" && data.appointmentDate) {
+    await assertNoConfirmedConflict(existing.patientId, data.appointmentDate, id);
+  }
+
+  const appointment = await prisma.appointment.update({
+    where: { id },
+    data,
+    include: { patient: patientSelect },
+  });
+  await logAction(userId, "UPDATE", "appointment", id, { fields: Object.keys(data) });
+  return appointment;
+}
+
+export async function updateStatus(id: string, status: AppointmentStatus, userId: string) {
   const appointment = await prisma.appointment.findUnique({ where: { id } });
   if (!appointment) throw new AppError(404, "Rendez-vous introuvable");
 
   if (status === "confirmed") {
-    await assertNoConfirmedConflict(
-      appointment.patientId,
-      appointment.appointmentDate,
-      appointment.id
-    );
+    await assertNoConfirmedConflict(appointment.patientId, appointment.appointmentDate, appointment.id);
   }
 
-  return prisma.appointment.update({
+  const updated = await prisma.appointment.update({
     where: { id },
     data: { status },
     include: { patient: patientSelect },
   });
+  await logAction(userId, "STATUS_CHANGE", "appointment", id, { from: appointment.status, to: status });
+  return updated;
 }
