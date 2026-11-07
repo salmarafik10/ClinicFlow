@@ -40,3 +40,12 @@ export interface AuditLog {
   createdAt: string;
   user: { id: string; fullName: string; role: "admin" | "staff" } | null;
 }
+
+export interface AppUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: "admin" | "staff";
+  isActive: boolean;
+  createdAt: string;
+}
