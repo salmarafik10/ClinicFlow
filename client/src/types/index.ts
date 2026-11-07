@@ -30,3 +30,13 @@ export interface Appointment {
 export interface PatientWithAppointments extends Patient {
   appointments: Appointment[];
 }
+
+export interface AuditLog {
+  id: string;
+  action: string;
+  entity: string;
+  entityId: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  user: { id: string; fullName: string; role: "admin" | "staff" } | null;
+}

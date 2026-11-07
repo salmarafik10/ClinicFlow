@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, CalendarX } from "lucide-react";
+import { Plus, CalendarX, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "../api/axios";
 import AppointmentModal from "../components/AppointmentModal";
@@ -8,6 +8,7 @@ import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
 import { ListSkeleton } from "../components/Skeleton";
 import type { Appointment, AppointmentStatus } from "../types";
+
 
 const fmt = (d: string) =>
   new Date(d).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
@@ -18,6 +19,7 @@ export default function Appointments() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<Appointment | null>(null);
 
   async function load() {
     setLoading(true);
@@ -52,6 +54,7 @@ export default function Appointments() {
     "w-full sm:w-auto rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   const statusSelect = (a: Appointment) => (
+  <div className="flex items-center gap-2 md:justify-end">
     <select
       value={a.status}
       onChange={(e) => changeStatus(a.id, e.target.value as AppointmentStatus)}
@@ -61,7 +64,15 @@ export default function Appointments() {
       <option value="confirmed">Confirmé</option>
       <option value="cancelled">Annulé</option>
     </select>
-  );
+    <button
+      onClick={() => setEditing(a)}
+      title="Modifier"
+      className="grid place-items-center w-8 h-8 rounded-full text-slate-500 hover:bg-amber-50 hover:text-amber-600"
+    >
+      <Pencil size={16} />
+    </button>
+  </div>
+);
 
   const addButton = (
     <button
@@ -161,16 +172,21 @@ export default function Appointments() {
         )}
       </div>
 
-      {modalOpen && (
-        <AppointmentModal
-          onClose={() => setModalOpen(false)}
-          onSaved={() => {
-            toast.success("Rendez-vous créé");
-            setModalOpen(false);
-            load();
-          }}
-        />
-      )}
+     {(modalOpen || editing) && (
+  <AppointmentModal
+    appointment={editing}
+    onClose={() => {
+      setModalOpen(false);
+      setEditing(null);
+    }}
+    onSaved={() => {
+      toast.success(editing ? "Rendez-vous modifié" : "Rendez-vous créé");
+      setModalOpen(false);
+      setEditing(null);
+      load();
+    }}
+  />
+)}
     </div>
   );
 }
