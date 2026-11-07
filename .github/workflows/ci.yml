@@ -46,6 +46,9 @@ jobs:
       - run: npm ci
       - run: npx prisma generate
       - run: npx prisma migrate deploy
+      - run: npx prisma migrate deploy
+      - run: npm test
+      - run: npm run build
       - run: npm run build
 
   client:
