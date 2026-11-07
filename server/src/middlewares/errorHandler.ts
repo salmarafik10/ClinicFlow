@@ -20,7 +20,13 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
 
   // Violation de la contrainte EXCLUDE (RDV confirmés trop proches) - filet de sécurité
   const code = (err as any)?.code ?? (err as any)?.cause?.code;
-  if (code === "23P01") {
+  const message = String((err as any)?.message ?? "");
+
+  if (
+    code === "23P01" ||
+    message.includes("appointments_no_overlap_confirmed") ||
+    message.includes("exclusion constraint")
+  ) {
     return res.status(409).json({
       message: "Ce patient a déjà un rendez-vous confirmé dans une fenêtre de 30 minutes",
     });
