@@ -1,8 +1,11 @@
 import { prisma } from "../config/prisma";
 import { AppError } from "../utils/AppError";
+import { logAction } from "./audit.service";
 
-export async function createPatient(data: any) {
-  return prisma.patient.create({ data });
+export async function createPatient(data: any, userId: string) {
+  const patient = await prisma.patient.create({ data });
+  await logAction(userId, "CREATE", "patient", patient.id, { fullName: patient.fullName });
+  return patient;
 }
 
 export async function listPatients(search: string | undefined, page: number, limit: number) {
@@ -28,10 +31,7 @@ export async function listPatients(search: string | undefined, page: number, lim
     prisma.patient.count({ where }),
   ]);
 
-  return {
-    items,
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  };
+  return { items, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 export async function getPatient(id: string) {
@@ -43,13 +43,16 @@ export async function getPatient(id: string) {
   return patient;
 }
 
-export async function updatePatient(id: string, data: any) {
+export async function updatePatient(id: string, data: any, userId: string) {
   await getPatient(id);
-  return prisma.patient.update({ where: { id }, data });
+  const patient = await prisma.patient.update({ where: { id }, data });
+  await logAction(userId, "UPDATE", "patient", id, { fields: Object.keys(data) });
+  return patient;
 }
 
 // Soft delete
-export async function deletePatient(id: string) {
-  await getPatient(id);
+export async function deletePatient(id: string, userId: string) {
+  const patient = await getPatient(id);
   await prisma.patient.update({ where: { id }, data: { deletedAt: new Date() } });
+  await logAction(userId, "DELETE", "patient", id, { fullName: patient.fullName });
 }

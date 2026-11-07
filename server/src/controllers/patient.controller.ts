@@ -9,7 +9,7 @@ import {
 
 export async function create(req: Request, res: Response) {
   const data = createPatientSchema.parse(req.body);
-  res.status(201).json(await service.createPatient(data));
+  res.status(201).json(await service.createPatient(data, req.user!.id));
 }
 
 export async function list(req: Request, res: Response) {
@@ -25,11 +25,11 @@ export async function getOne(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   const { id } = idParamSchema.parse(req.params);
   const data = updatePatientSchema.parse(req.body);
-  res.json(await service.updatePatient(id, data));
+  res.json(await service.updatePatient(id, data, req.user!.id));
 }
 
 export async function remove(req: Request, res: Response) {
   const { id } = idParamSchema.parse(req.params);
-  await service.deletePatient(id);
+  await service.deletePatient(id, req.user!.id);
   res.status(204).send();
 }
