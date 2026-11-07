@@ -8,6 +8,8 @@ import authRoutes from "./routes/auth.routes";
 import patientRoutes from "./routes/patient.routes";
 import appointmentRoutes from "./routes/appointment.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
+import auditRoutes from "./routes/audit.routes";
+
 
 const app = express();
 
@@ -27,6 +29,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/audit-logs", auditRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
