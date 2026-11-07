@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { Stethoscope, LogOut, Menu, X } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, Moon, Sun } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 const links = [
   { to: "/", label: "Dashboard", end: true, admin: false },
@@ -13,33 +14,46 @@ const links = [
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { dark, toggle } = useTheme();
   const [open, setOpen] = useState(false);
   const visibleLinks = links.filter((l) => !l.admin || user?.role === "admin");
   const initials = user?.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
   const desktopLink = ({ isActive }: { isActive: boolean }) =>
-    `rounded-full px-5 py-2 text-sm font-medium transition ${
-      isActive ? "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow" : "text-slate-600 hover:bg-white"
+    `rounded-full px-4 py-2 text-sm font-medium transition ${
+      isActive
+        ? "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow"
+        : "text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-600"
     }`;
 
   const mobileLink = ({ isActive }: { isActive: boolean }) =>
     `block rounded-xl px-4 py-3 text-sm font-medium ${
-      isActive ? "bg-blue-600 text-white" : "text-slate-700 hover:bg-slate-100"
+      isActive ? "bg-blue-600 text-white" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
     }`;
+
+  const themeButton = (
+    <button
+      onClick={toggle}
+      title="Thème"
+      className="grid place-items-center w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+    >
+      {dark ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
 
   return (
     <div className="min-h-screen p-2 sm:p-6">
-      <div className="mx-auto max-w-7xl rounded-3xl bg-slate-50 p-3 sm:p-5 shadow-sm">
-        <header className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+      <div className="mx-auto max-w-7xl rounded-3xl bg-slate-50 dark:bg-slate-900 p-3 sm:p-5 shadow-sm">
+        <header className="rounded-2xl bg-white dark:bg-slate-800 px-4 py-3 shadow-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-800">
+            <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-100">
               <span className="grid place-items-center w-9 h-9 rounded-xl bg-blue-600 text-white">
                 <Stethoscope size={18} />
               </span>
               ClinicFlow
             </div>
 
-            <nav className="hidden md:flex items-center gap-2 rounded-full bg-slate-100 p-1">
+            <nav className="hidden md:flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 p-1">
               {visibleLinks.map((l) => (
                 <NavLink key={l.to} to={l.to} end={l.end} className={desktopLink}>
                   {l.label}
@@ -48,24 +62,29 @@ export default function Layout() {
             </nav>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden lg:block text-right leading-tight">
-                <p className="text-sm font-semibold text-slate-800">{user?.fullName}</p>
-                <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+              <div className="hidden xl:block text-right leading-tight">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{user?.fullName}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role}</p>
               </div>
-              <NavLink to="/profile" title="Mon profil" className="grid place-items-center w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm hover:bg-blue-200">
+              <NavLink
+                to="/profile"
+                title="Mon profil"
+                className="grid place-items-center w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm hover:bg-blue-200"
+              >
                 {initials}
               </NavLink>
+              {themeButton}
               <button
                 onClick={logout}
                 title="Déconnexion"
-                className="hidden md:grid place-items-center w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 transition"
+                className="hidden md:grid place-items-center w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600 dark:bg-slate-700 dark:text-slate-200 transition"
               >
                 <LogOut size={18} />
               </button>
               <button
                 onClick={() => setOpen(!open)}
                 aria-label="Menu"
-                className="md:hidden grid place-items-center w-10 h-10 rounded-full bg-slate-100 text-slate-700"
+                className="md:hidden grid place-items-center w-10 h-10 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
               >
                 {open ? <X size={20} /> : <Menu size={20} />}
               </button>
@@ -73,7 +92,7 @@ export default function Layout() {
           </div>
 
           {open && (
-            <nav className="md:hidden mt-3 pt-3 border-t border-slate-100 space-y-1">
+            <nav className="md:hidden mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-1">
               {visibleLinks.map((l) => (
                 <NavLink key={l.to} to={l.to} end={l.end} className={mobileLink} onClick={() => setOpen(false)}>
                   {l.label}
@@ -81,7 +100,7 @@ export default function Layout() {
               ))}
               <button
                 onClick={logout}
-                className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50"
+                className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-slate-700"
               >
                 <LogOut size={16} /> Déconnexion
               </button>

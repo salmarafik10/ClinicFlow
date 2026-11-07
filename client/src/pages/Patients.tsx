@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Trash2, Eye, ChevronLeft, ChevronRight, Users, Phone, RotateCcw} from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, ChevronLeft, ChevronRight, Users, Phone, RotateCcw, Download} from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +9,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import EmptyState from "../components/EmptyState";
 import { ListSkeleton } from "../components/Skeleton";
 import type { Patient, Pagination } from "../types";
+import { downloadCsv } from "../utils/csv";
 
 const LIMIT = 8;
 
@@ -120,6 +121,17 @@ export default function Patients() {
           <p className="text-slate-500 mt-1">{pagination?.total ?? 0} patient(s)</p>
         </div>
         {addButton}
+        <button
+  onClick={() =>
+    downloadCsv("patients.csv", [
+      ["Nom", "CIN", "Téléphone", "Naissance", "Adresse"],
+      ...items.map((p) => [p.fullName, p.cin, p.phone, new Date(p.birthDate).toLocaleDateString("fr-FR"), p.address]),
+    ])
+  }
+  className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50"
+>
+  <Download size={16} /> Exporter CSV
+</button>
       </div>
 
       <div className="relative mb-4 w-full sm:max-w-sm">

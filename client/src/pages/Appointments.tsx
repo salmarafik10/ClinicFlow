@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, CalendarX, Pencil } from "lucide-react";
+import { Plus, CalendarX, Pencil, List, CalendarDays, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "../api/axios";
 import AppointmentModal from "../components/AppointmentModal";
@@ -8,7 +8,8 @@ import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
 import { ListSkeleton } from "../components/Skeleton";
 import type { Appointment, AppointmentStatus } from "../types";
-
+import WeekCalendar, { startOfWeek } from "../components/WeekCalendar";
+import { downloadCsv } from "../utils/csv";
 
 const fmt = (d: string) =>
   new Date(d).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
@@ -20,6 +21,8 @@ export default function Appointments() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Appointment | null>(null);
+  const [view, setView] = useState<"list" | "calendar">("list");
+  const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
 
   async function load() {
     setLoading(true);
@@ -91,6 +94,20 @@ export default function Appointments() {
           <p className="text-slate-500 mt-1">{items.length} rendez-vous</p>
         </div>
         {addButton}
+        <button
+  onClick={() =>
+    downloadCsv("rendez-vous.csv", [
+      ["Date", "Patient", "CIN", "Motif", "Statut", "Notes"],
+      ...items.map((a) => [
+        new Date(a.appointmentDate).toLocaleString("fr-FR"),
+        a.patient?.fullName, a.patient?.cin, a.reason, a.status, a.notes,
+      ]),
+    ])
+  }
+  className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50"
+>
+  <Download size={16} /> Exporter CSV
+</button>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-4">
@@ -113,6 +130,26 @@ export default function Appointments() {
           </button>
         )}
       </div>
+
+      <div className="inline-flex rounded-full bg-slate-100 p-1 mb-4">
+        {([["list", "Liste", List], ["calendar", "Calendrier", CalendarDays]] as const).map(([key, label, Icon]) => (
+          <button
+            key={key}
+            onClick={() => setView(key)}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${view === key ? "bg-white shadow text-blue-600" : "text-slate-500"}`}
+          >
+            <Icon size={16} /> {label}
+          </button>
+        ))}
+      </div>
+      {view === "calendar" ? (
+  <WeekCalendar
+    appointments={items}
+    weekStart={weekStart}
+    onWeekChange={setWeekStart}
+    onSelect={(a) => setEditing(a)}
+  />
+) : (
 
       <div className="rounded-2xl bg-white shadow-sm">
         {loading ? (
@@ -171,6 +208,8 @@ export default function Appointments() {
           </>
         )}
       </div>
+
+      )}
 
      {(modalOpen || editing) && (
   <AppointmentModal
