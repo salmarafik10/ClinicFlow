@@ -10,9 +10,13 @@ import appointmentRoutes from "./routes/appointment.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import auditRoutes from "./routes/audit.routes";
 import userRoutes from "./routes/user.routes";
+import swaggerUi from "swagger-ui-express";
+import { openApiSpec } from "./docs/openapi";
 
 
 const app = express();
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 app.use(helmet());
 app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
